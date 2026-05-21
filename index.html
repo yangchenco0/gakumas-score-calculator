@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>学园偶像大师 剧本算分工具</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --card: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --gold: #f0c060;
+    --text: #eee;
+    --text2: #aab;
+    --vo: #ff6b6b;
+    --da: #4ecdc4;
+    --vi: #ffe66d;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container { max-width: 900px; width: 100%; }
+  h1 {
+    text-align: center;
+    font-size: 1.8em;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle { text-align: center; color: var(--text2); margin-bottom: 20px; font-size: 0.9em; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; margin-bottom: 20px;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .tab {
+    flex: 1; padding: 12px 20px; text-align: center;
+    cursor: pointer; font-weight: 600; font-size: 0.95em;
+    background: var(--card); color: var(--text2);
+    transition: all 0.2s; border: none;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+  .tab:last-child { border-right: none; }
+  .tab.active {
+    background: var(--accent); color: #fff;
+  }
+  .tab:hover:not(.active) {
+    background: #1e2d50; color: var(--text);
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .card h2 {
+    font-size: 1.1em;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card h2 .icon { font-size: 1.3em; }
+
+  .input-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .input-group {
+    flex: 1;
+    min-width: 140px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 0.85em;
+    color: var(--text2);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-size: 16px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input.vo { border-left: 3px solid var(--vo); }
+  .input-group input.da { border-left: 3px solid var(--da); }
+  .input-group input.vi { border-left: 3px solid var(--vi); }
+  .input-group input.exam { border-left: 3px solid var(--gold); }
+
+  .star-input {
+    display: flex; align-items: center; gap: 8px;
+    flex: 1; min-width: 200px;
+  }
+  .star-input label { white-space: nowrap; }
+  .star-input input { width: 80px; }
+
+  /* result */
+  .result-big {
+    text-align: center;
+    padding: 20px 0;
+  }
+  .final-score {
+    font-size: 3.5em;
+    font-weight: 900;
+    background: linear-gradient(180deg, var(--gold) 0%, #d4a020 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  .final-label { color: var(--text2); font-size: 0.85em; margin-top: 4px; }
+
+  .grade-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 24px;
+    border-radius: 20px;
+    font-size: 1.3em;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+  .grade-ss  { background: #2ecc71; color: #000; }
+  .grade-ssp { background: #27ae60; color: #fff; }
+  .grade-sss { background: #f39c12; color: #000; }
+  .grade-sssp{ background: #e67e22; color: #fff; }
+  .grade-s4  { background: #e74c3c; color: #fff; }
+  .grade-s4p { background: #c0392b; color: #fff; }
+  .grade-s5  { background: linear-gradient(135deg, #f0c060, #e94560, #9b59b6); color: #fff; }
+  .grade-ap  { background: #3498db; color: #fff; }
+  .grade-s   { background: #9b59b6; color: #fff; }
+  .grade-sp  { background: #8e44ad; color: #fff; }
+  .grade-norank { background: rgba(255,255,255,0.08); color: var(--text2); }
+
+  .grade-scale {
+    display: flex; gap: 2px; margin-top: 14px;
+    border-radius: 8px; overflow: hidden; height: 28px;
+  }
+  .grade-scale-item {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 0.7em; font-weight: 700; color: rgba(0,0,0,0.7);
+    transition: all 0.3s; position: relative;
+  }
+  .grade-scale-item.dim { opacity: 0.35; }
+  .grade-scale-item.current {
+    transform: scaleY(1.35); border-radius: 4px;
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    z-index: 1; color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .break-item {
+    background: var(--accent2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .break-item .val {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .break-item .lbl {
+    font-size: 0.78em;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+
+  .break-formula {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 0.85em;
+    color: var(--text2);
+    padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    font-family: monospace;
+  }
+
+  /* bar chart */
+  .bar-chart { margin-top: 16px; }
+  .bar-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .bar-label {
+    width: 80px; font-size: 0.8em; text-align: right;
+    color: var(--text2); flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1; height: 22px; background: rgba(255,255,255,0.05);
+    border-radius: 6px; overflow: hidden; position: relative;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 6px; transition: width 0.3s ease;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px; font-size: 0.7em; font-weight: 600;
+    white-space: nowrap;
+  }
+  .bar-fill.attr { background: linear-gradient(90deg, #667eea, #764ba2); }
+  .bar-fill.star { background: linear-gradient(90deg, #f093fb, #f5576c); }
+  .bar-fill.exam1 { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+  .bar-fill.exam2 { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+  .bar-fill.penalty { background: var(--accent); }
+
+  /* reference tables */
+  .ref-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.8em; margin-top: 8px;
+  }
+  .ref-table th {
+    background: var(--accent2);
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.75em;
+  }
+  .ref-table td {
+    padding: 7px 10px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .ref-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .ref-table .highlight { color: var(--gold); font-weight: 600; }
+
+  .collapsible {
+    cursor: pointer;
+    user-select: none;
+  }
+  .collapsible::after {
+    content: ' ▼';
+    font-size: 0.6em;
+    color: var(--text2);
+  }
+  .collapsible.collapsed::after {
+    content: ' ▶';
+  }
+  .coll-content { overflow: hidden; transition: max-height 0.3s; }
+  .coll-content.hidden { max-height: 0 !important; }
+
+  .note {
+    font-size: 0.75em; color: var(--text2); margin-top: 6px;
+  }
+
+  .exam-eval {
+    font-size: 0.82em; color: var(--text2);
+    margin-top: 8px; padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 6px;
+  }
+  .exam-eval span { color: var(--gold); font-weight: 600; }
+
+  footer {
+    text-align: center; font-size: 0.7em; color: var(--text2);
+    margin-top: 20px; padding: 10px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  .mode-section { display: none; }
+  .mode-section.active { display: block; }
+
+  .sub-mode { display: none; }
+  .sub-mode.active { display: block; }
+  .nia-diff { display: none; }
+  .nia-diff.active { display: block; }
+
+  /* sub tabs */
+  .sub-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+  }
+  .sub-tab {
+    flex: 1; padding: 8px 16px; text-align: center;
+    cursor: pointer; font-weight: 600; font-size: 0.85em;
+    background: rgba(255,255,255,0.04); color: var(--text2);
+    border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.2s;
+  }
+  .sub-tab.active {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  .sub-tab:hover:not(.active) {
+    background: rgba(255,255,255,0.08); color: var(--text);
+  }
+
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .card { padding: 16px; margin-bottom: 14px; }
+    h1 { font-size: 1.4em; }
+    .subtitle { font-size: 0.8em; margin-bottom: 14px; }
+    .tab { padding: 10px 14px; font-size: 0.85em; }
+    .sub-tab { padding: 7px 10px; font-size: 0.78em; }
+    .input-row { gap: 10px; }
+    .input-group { min-width: 120px; }
+    .input-group input { padding: 10px 12px; }
+    .star-input { min-width: 150px; flex-wrap: wrap; }
+    .breakdown { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .break-item { padding: 10px 12px; }
+    .break-item .val { font-size: 1.2em; }
+    .final-score { font-size: 2.5em; }
+    .grade-badge { font-size: 1.1em; padding: 5px 18px; }
+    .bar-label { width: 60px; font-size: 0.7em; }
+    .bar-track { height: 18px; }
+    .bar-fill { font-size: 0.65em; }
+    .grade-scale { height: 22px; gap: 1px; }
+    .grade-scale-item { font-size: 0.6em; }
+    .ref-table { font-size: 0.7em; }
+    .ref-table th, .ref-table td { padding: 5px 6px; }
+    .break-formula { font-size: 0.72em; word-break: break-all; }
+    .exam-eval { font-size: 0.72em; }
+    .note { font-size: 0.7em; }
+  }
+
+  @media (max-width: 400px) {
+    body { padding: 8px; }
+    .card { padding: 12px; margin-bottom: 10px; }
+    h1 { font-size: 1.2em; }
+    .tab { padding: 8px 10px; font-size: 0.8em; }
+    .sub-tab { padding: 6px 8px; font-size: 0.72em; }
+    .input-group { min-width: 100px; }
+    .input-group input { padding: 8px 10px; font-size: 16px; }
+    .breakdown { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .break-item { padding: 8px 10px; }
+    .break-item .val { font-size: 1.05em; }
+    .final-score { font-size: 2em; }
+    .grade-badge { font-size: 1em; padding: 4px 14px; }
+    .bar-label { width: 50px; font-size: 0.65em; }
+    .bar-row { gap: 6px; margin-bottom: 5px; }
+    .bar-track { height: 16px; }
+  }
+
+  /* iOS safe area */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>学园偶像大师 剧本算分工具</h1>
+<p class="subtitle">H.I.F. / 初LG Score Calculator</p>
+
+<!-- Tab switcher -->
+<div class="tabs">
+  <button class="tab active" onclick="switchMode('hif')">HIF 剧本</button>
+  <button class="tab" onclick="switchMode('new')">初LG</button>
+  <button class="tab" onclick="switchMode('nia')">NIA</button>
+  <button class="tab" onclick="switchMode('first')">初剧本</button>
+</div>
+
+<!-- ==================== HIF MODE ==================== -->
+<div id="mode-hif" class="mode-section active">
+
+  <!-- Shared inputs: Vo, Da, Vi, 星耀值, 本战1 -->
+  <div class="card" id="hif-shared-inputs">
+    <h2><span class="icon">📊</span>属性 &amp; 本战1</h2>
+    <div class="input-row">
+      <div class="input-group">
+        <label style="color:var(--vo)">Vo（声乐）</label>
+        <input type="number" id="hif-vo" class="vo" placeholder="例: 3200" value="0" step="1" min="0" max="3200">
+      </div>
+      <div class="input-group">
+        <label style="color:var(--da)">Da（舞蹈）</label>
+        <input type="number" id="hif-da" class="da" placeholder="例: 3200" value="0" step="1" min="0" max="3200">
+      </div>
+      <div class="input-group">
+        <label style="color:var(--vi)">Vi（视觉）</label>
+        <input type="number" id="hif-vi" class="vi" placeholder="例: 3200" value="0" step="1" min="0" max="3200">
+      </div>
+      <div class="input-group star-input">
+        <label>星耀值合计</label>
+        <input type="number" id="hif-star" value="1335" step="1" min="0">
+        <span style="font-size:0.7em;color:var(--text2)">默认1335（满分）</span>
+      </div>
+      <div class="input-group">
+        <label style="color:var(--gold)">本战1 得分（万）</label>
+        <input type="number" id="hif-b1" class="exam" placeholder="例: 85" value="85" step="0.1" min="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-tabs for HIF -->
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchHifSub('forward')">正向算分</button>
+    <button class="sub-tab" onclick="switchHifSub('reverse')">目标反算</button>
+    <button class="sub-tab" onclick="switchHifSub('attr')">属性反算</button>
+  </div>
+
+  <!-- ===== HIF 正向算分 ===== -->
+  <div id="hif-sub-forward" class="sub-mode active">
+    <div class="card">
+      <h2><span class="icon">📝</span>本战2得分输入</h2>
+      <div class="input-row">
+        <div class="input-group" style="max-width:300px">
+          <label style="color:var(--gold)">本战2 得分（万）</label>
+          <input type="number" id="hif-b2" class="exam" placeholder="例: 120" value="120" step="0.1" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">🏆</span>最终评分</h2>
+      <div class="result-big">
+        <div class="final-score" id="hif-final">--</div>
+        <div class="grade-badge grade-norank" id="hif-grade">--</div>
+        <div class="final-label" id="hif-formula-label">公式：属性值总和 × 2 + 星耀值 × 7.5 + 本战评价值 − 2000</div>
+      </div>
+      <div class="bar-chart" id="hif-bar"></div>
+      <div class="breakdown" id="hif-breakdown"></div>
+      <div class="break-formula" id="hif-formula"></div>
+      <div class="grade-scale" id="hif-gradescale"></div>
+      <div class="exam-eval" id="hif-eval-detail"></div>
+    </div>
+  </div>
+
+  <!-- ===== HIF 目标反算 ===== -->
+  <div id="hif-sub-reverse" class="sub-mode">
+    <div class="card">
+      <h2><span class="icon">🎯</span>各评级所需本战2得分</h2>
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据当前属性、星耀值与本战1得分，反算达成各评级所需的本战2得分</p>
+      <div id="hif-target-table"></div>
+      <div class="note" id="hif-target-max" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== HIF 属性反算 ===== -->
+  <div id="hif-sub-attr" class="sub-mode">
+    <div class="card">
+      <h2><span class="icon">📝</span>本战得分 &amp; 星耀值</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label style="color:var(--gold)">本战1 得分（万）</label>
+          <input type="number" id="hif-attr-b1" class="exam" placeholder="例: 85" value="85" step="0.01" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--gold)">本战2 得分（万）</label>
+          <input type="number" id="hif-attr-b2" class="exam" placeholder="例: 120" value="120" step="0.01" min="0">
+        </div>
+        <div class="input-group star-input">
+          <label>星耀值合计</label>
+          <input type="number" id="hif-attr-star" value="1335" step="1" min="0">
+          <span style="font-size:0.7em;color:var(--text2)">默认1335（满分）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">🎯</span>各评级所需三维属性合计</h2>
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据本战1、本战2得分与星耀值，反算达成各评级所需的 Vo+Da+Vi 属性总和</p>
+      <div id="hif-attr-table"></div>
+      <div class="note" id="hif-attr-note" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- HIF reference tables -->
+  <div class="card">
+    <h2 class="collapsible" onclick="toggleCollapse(this)"><span class="icon">📋</span>本战评价值对照表（点击展开）</h2>
+    <div class="coll-content hidden" style="max-height:600px">
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:10px">本战评价值 = 本战1评价值 + 本战2评价值</p>
+      <table class="ref-table">
+        <thead><tr><th>阶段</th><th>得分区间（万）</th><th>倍率</th><th>评价值区间</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="5" style="font-weight:700">本战1</td><td>0 ~ 30</td><td>0</td><td>0</td></tr>
+          <tr><td>30 ~ 70</td><td>1.0%</td><td>0 ~ 4,000</td></tr>
+          <tr><td>70 ~ 100</td><td>0.3%</td><td>4,000 ~ 4,900</td></tr>
+          <tr><td>100 ~ 120</td><td>0.2%</td><td>4,900 ~ 5,300</td></tr>
+          <tr><td>120 ~ 140</td><td>0.1%</td><td>5,300 ~ 5,500</td></tr>
+          <tr><td rowspan="5" style="font-weight:700">本战2</td><td>0 ~ 60</td><td>0</td><td>0</td></tr>
+          <tr><td>60 ~ 90</td><td>0.4%</td><td>0 ~ 1,200</td></tr>
+          <tr><td>90 ~ 150</td><td>0.8%</td><td>1,200 ~ 6,000</td></tr>
+          <tr><td>150 ~ 200</td><td>0.2%</td><td>6,000 ~ 7,000</td></tr>
+          <tr><td>200 ~ 240</td><td>0.1%</td><td>7,000 ~ 7,400</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="collapsible collapsed" onclick="toggleCollapse(this)"><span class="icon">📈</span>HIF审查线参考（点击展开）</h2>
+    <div class="coll-content hidden" style="max-height:600px">
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:10px">◎/○ 表示单极/均衡的及格线，数据来源 bilibili@優奈</p>
+      <div class="table-wrap">
+      <table class="ref-table" style="font-size:0.75em">
+        <thead><tr><th>类型</th><th>标记</th><th>选拔1-一属</th><th>选拔1-二属</th><th>选拔1-三属</th><th>选拔2-一属</th><th>选拔2-二属</th><th>选拔2-三属</th><th>选拔3-一属</th><th>选拔3-二属</th><th>选拔3-三属</th><th>本战-一属</th><th>本战-二属</th><th>本战-三属</th></tr></thead>
+        <tbody>
+          <tr><td>单极</td><td>◎/○</td><td>311</td><td>207</td><td>173</td><td>613</td><td>409</td><td>341</td><td>1035</td><td>690</td><td>575</td><td>1960</td><td>1307</td><td>1089</td></tr>
+          <tr><td>均衡</td><td>◎/○</td><td>296</td><td>221</td><td>172</td><td>585</td><td>435</td><td>340</td><td>988</td><td>735</td><td>574</td><td>1871</td><td>1392</td><td>1088</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="note">单极：单项属性极高；均衡：三维均衡发展。审查线表示通过各阶段所需的最低属性值。</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 初LG MODE ==================== -->
+<div id="mode-new" class="mode-section">
+
+  <!-- Shared inputs: Vo, Da, Vi, 期中得分 -->
+  <div class="card" id="new-shared-inputs">
+    <h2><span class="icon">📊</span>属性 &amp; 期中得分</h2>
+    <div class="input-row">
+      <div class="input-group">
+        <label style="color:var(--vo)">Vo（声乐）</label>
+        <input type="number" id="new-vo" class="vo" placeholder="例: 3500" value="3500" step="1">
+      </div>
+      <div class="input-group">
+        <label style="color:var(--da)">Da（舞蹈）</label>
+        <input type="number" id="new-da" class="da" placeholder="例: 3200" value="3200" step="1">
+      </div>
+      <div class="input-group">
+        <label style="color:var(--vi)">Vi（视觉）</label>
+        <input type="number" id="new-vi" class="vi" placeholder="例: 3000" value="3000" step="1">
+      </div>
+      <div class="input-group">
+        <label style="color:var(--gold)">中間試験 得分</label>
+        <input type="number" id="new-mid" class="exam" placeholder="例: 50000" value="50000" step="100" min="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-tabs for 初LG -->
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchNewSub('forward')">正向算分</button>
+    <button class="sub-tab" onclick="switchNewSub('reverse')">目标反算</button>
+    <button class="sub-tab" onclick="switchNewSub('attr')">属性反算</button>
+  </div>
+
+  <!-- ===== 正向算分: input 期末 → output 评分 ===== -->
+  <div id="new-sub-forward" class="sub-mode active">
+    <div class="card">
+      <h2><span class="icon">📝</span>期末得分输入</h2>
+      <div class="input-row">
+        <div class="input-group" style="max-width:300px">
+          <label style="color:var(--gold)">最終試験 得分</label>
+          <input type="number" id="new-final" class="exam" placeholder="例: 500000" value="500000" step="100" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">🏆</span>最终评分</h2>
+      <div class="result-big">
+        <div class="final-score" id="new-total">--</div>
+        <div class="grade-badge grade-norank" id="new-grade">--</div>
+        <div class="final-label">公式：属性值总和 × 2.1 + 考试评价值</div>
+      </div>
+      <div class="bar-chart" id="new-bar"></div>
+      <div class="breakdown" id="new-breakdown"></div>
+      <div class="break-formula" id="new-formula"></div>
+      <div class="grade-scale" id="new-gradescale"></div>
+      <div class="exam-eval" id="new-eval-detail"></div>
+    </div>
+  </div>
+
+  <!-- ===== 目标反算: 看各评级需要多少期末分 ===== -->
+  <div id="new-sub-reverse" class="sub-mode">
+    <div class="card">
+      <h2><span class="icon">🎯</span>各评级所需期末得分</h2>
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据当前属性与期中分数，反算达成各评级所需的最终試験得分</p>
+      <div id="new-target-table"></div>
+      <div class="note" id="new-target-max" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- ===== 属性反算: 看各评级需要多少属性 ===== -->
+  <div id="new-sub-attr" class="sub-mode">
+    <div class="card">
+      <h2><span class="icon">📝</span>考试得分输入</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label style="color:var(--gold)">中間試験 得分</label>
+          <input type="number" id="new-attr-mid" class="exam" placeholder="例: 50000" value="50000" step="100" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--gold)">最終試験 得分</label>
+          <input type="number" id="new-attr-fin" class="exam" placeholder="例: 500000" value="500000" step="100" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="icon">🎯</span>各评级所需三维属性合计</h2>
+      <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据期中与期末分数，反算达成各评级所需的 Vo+Da+Vi 属性总和</p>
+      <div id="new-attr-table"></div>
+      <div class="note" id="new-attr-note" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Reference tables (shared) -->
+  <div class="card">
+    <h2 class="collapsible" onclick="toggleCollapse(this)"><span class="icon">📋</span>中間試験 评价值对照表（点击展开）</h2>
+    <div class="coll-content hidden" style="max-height:400px">
+      <table class="ref-table">
+        <thead><tr><th>獲得スコア</th><th>倍率</th><th>評価値</th></tr></thead>
+        <tbody>
+          <tr><td>~ 30,000</td><td>-</td><td>2,400</td></tr>
+          <tr><td>30,000 ~ 40,000</td><td>0.8%</td><td>2,400 ~ 2,480</td></tr>
+          <tr><td>40,000 ~ 50,000</td><td>0.3%</td><td>2,480 ~ 2,510</td></tr>
+          <tr><td>50,000 ~ 60,000</td><td>0.2%</td><td>2,510 ~ 2,530</td></tr>
+          <tr><td>60,000 ~ 200,000</td><td>0.1%</td><td>2,530 ~ 2,670（上限）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="collapsible collapsed" onclick="toggleCollapse(this)"><span class="icon">📋</span>最終試験 评价值对照表（点击展开）</h2>
+    <div class="coll-content hidden" style="max-height:400px">
+      <table class="ref-table">
+        <thead><tr><th>獲得スコア</th><th>倍率</th><th>評価値</th></tr></thead>
+        <tbody>
+          <tr><td>~ 400,000</td><td>-</td><td>7,200</td></tr>
+          <tr><td>400,000 ~ 500,000</td><td>1.0%</td><td>7,200 ~ 8,200</td></tr>
+          <tr><td>500,000 ~ 600,000</td><td>0.8%</td><td>8,200 ~ 9,000</td></tr>
+          <tr><td>600,000 ~ 2,000,000</td><td>0.1%</td><td>9,000 ~ 10,400（上限）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== NIA MODE ==================== -->
+<div id="mode-nia" class="mode-section">
+
+  <!-- NIA difficulty sub-tabs -->
+  <div class="sub-tabs" style="margin-bottom:16px">
+    <button class="sub-tab active" onclick="switchNiaDiff('pro')">pro</button>
+    <button class="sub-tab" onclick="switchNiaDiff('master')">master</button>
+  </div>
+
+  <!-- ===== PRO difficulty ===== -->
+  <div id="nia-diff-pro" class="nia-diff active">
+    <div class="card">
+      <h2><span class="icon">📊</span>三维属性</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label style="color:var(--vo)">Vo（声乐）</label>
+          <input type="number" id="nia-pro-vo" class="vo" placeholder="例: 3500" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--da)">Da（舞蹈）</label>
+          <input type="number" id="nia-pro-da" class="da" placeholder="例: 3200" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--vi)">Vi（视觉）</label>
+          <input type="number" id="nia-pro-vi" class="vi" placeholder="例: 3000" value="0" step="1" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchNiaProSub('forward')">正向算分</button>
+      <button class="sub-tab" onclick="switchNiaProSub('reverse')">目标反算</button>
+    </div>
+
+    <div id="nia-pro-forward" class="sub-mode active">
+      <div class="card">
+        <h2><span class="icon">📝</span>粉丝投票数</h2>
+        <div class="input-row">
+          <div class="input-group" style="max-width:300px">
+            <label style="color:var(--gold)">粉丝投票数</label>
+            <input type="number" id="nia-pro-votes" class="exam" placeholder="例: 50000" value="50000" step="1" min="0">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">🏆</span>最终评分</h2>
+        <div class="result-big">
+          <div class="final-score" id="nia-pro-total">--</div>
+          <div class="grade-badge grade-norank" id="nia-pro-grade">--</div>
+          <div class="final-label">公式：属性总和 × 2.3 + 粉丝数评分</div>
+        </div>
+        <div class="bar-chart" id="nia-pro-bar"></div>
+        <div class="breakdown" id="nia-pro-breakdown"></div>
+        <div class="break-formula" id="nia-pro-formula"></div>
+        <div class="grade-scale" id="nia-pro-gradescale"></div>
+        <div class="exam-eval" id="nia-pro-eval-detail"></div>
+      </div>
+    </div>
+
+    <div id="nia-pro-reverse" class="sub-mode">
+      <div class="card">
+        <h2><span class="icon">🎯</span>各评级所需粉丝投票数</h2>
+        <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据当前属性，反算达成各评级所需的粉丝投票数</p>
+        <div id="nia-pro-target-table"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="collapsible" onclick="toggleCollapse(this)"><span class="icon">📋</span>pro 系数对照表（点击展开）</h2>
+      <div class="coll-content hidden" style="max-height:350px">
+        <table class="ref-table">
+          <thead><tr><th>Rank</th><th>粉丝投票数</th><th>a</th><th>b</th></tr></thead>
+          <tbody>
+            <tr><td>-</td><td>~ 20,000</td><td>10.0%</td><td>0</td></tr>
+            <tr><td>A</td><td>20,001 ~ 40,000</td><td>8.5%</td><td>0</td></tr>
+            <tr><td>A+</td><td>40,001 ~ 60,000</td><td>7.0%</td><td>900</td></tr>
+            <tr><td>S</td><td>60,001 ~ 80,000</td><td>6.5%</td><td>1,200</td></tr>
+            <tr><td>S+</td><td>80,001 ~ 100,000</td><td>6.0%</td><td>1,600</td></tr>
+            <tr><td>SS</td><td>100,000 ~</td><td>5.5%</td><td>2,100</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MASTER difficulty ===== -->
+  <div id="nia-diff-master" class="nia-diff">
+    <div class="card">
+      <h2><span class="icon">📊</span>三维属性</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label style="color:var(--vo)">Vo（声乐）</label>
+          <input type="number" id="nia-mas-vo" class="vo" placeholder="例: 3500" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--da)">Da（舞蹈）</label>
+          <input type="number" id="nia-mas-da" class="da" placeholder="例: 3200" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--vi)">Vi（视觉）</label>
+          <input type="number" id="nia-mas-vi" class="vi" placeholder="例: 3000" value="0" step="1" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchNiaMasSub('forward')">正向算分</button>
+      <button class="sub-tab" onclick="switchNiaMasSub('reverse')">目标反算</button>
+    </div>
+
+    <div id="nia-mas-forward" class="sub-mode active">
+      <div class="card">
+        <h2><span class="icon">📝</span>投票数输入</h2>
+        <div class="input-row">
+          <div class="input-group" style="max-width:300px">
+            <label style="color:var(--gold)">投票数</label>
+            <input type="number" id="nia-mas-votes" class="exam" placeholder="例: 130000" value="130000" step="100" min="0">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">🏆</span>最终评分</h2>
+        <div class="result-big">
+          <div class="final-score" id="nia-mas-total">--</div>
+          <div class="grade-badge grade-norank" id="nia-mas-grade">--</div>
+          <div class="final-label">公式：属性总和 × 2.3 + 投票数 × 系数a + 基数b</div>
+        </div>
+        <div class="bar-chart" id="nia-mas-bar"></div>
+        <div class="breakdown" id="nia-mas-breakdown"></div>
+        <div class="break-formula" id="nia-mas-formula"></div>
+        <div class="grade-scale" id="nia-mas-gradescale"></div>
+        <div class="exam-eval" id="nia-mas-eval-detail"></div>
+      </div>
+    </div>
+
+    <div id="nia-mas-reverse" class="sub-mode">
+      <div class="card">
+        <h2><span class="icon">🎯</span>各评级所需投票数</h2>
+        <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据当前属性，反算达成各评级所需的投票数</p>
+        <div id="nia-mas-target-table"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="collapsible" onclick="toggleCollapse(this)"><span class="icon">📋</span>master 系数对照表（点击展开）</h2>
+      <div class="coll-content hidden" style="max-height:300px">
+        <table class="ref-table">
+          <thead><tr><th>投票数</th><th>系数 a</th><th>基数 b</th><th>投票得分公式</th></tr></thead>
+          <tbody>
+            <tr><td>100,000 ~ 120,000</td><td>5%</td><td>2,600</td><td>票数 × 5% + 2,600</td></tr>
+            <tr><td>120,000 ~ 140,000</td><td>4%</td><td>3,800</td><td>票数 × 4% + 3,800</td></tr>
+            <tr><td>140,000 以上</td><td>3%</td><td>5,200</td><td>票数 × 3% + 5,200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 初剧本 MODE ==================== -->
+<div id="mode-first" class="mode-section">
+
+  <div class="sub-tabs" style="margin-bottom:16px">
+    <button class="sub-tab active" onclick="switchFirstDiff('pro')">pro</button>
+  </div>
+
+  <!-- PRO difficulty -->
+  <div id="first-diff-pro" class="nia-diff active">
+    <div class="card">
+      <h2><span class="icon">📊</span>三维属性</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label style="color:var(--vo)">Vo（声乐）</label>
+          <input type="number" id="first-pro-vo" class="vo" placeholder="例: 3500" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--da)">Da（舞蹈）</label>
+          <input type="number" id="first-pro-da" class="da" placeholder="例: 3200" value="0" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label style="color:var(--vi)">Vi（视觉）</label>
+          <input type="number" id="first-pro-vi" class="vi" placeholder="例: 3000" value="0" step="1" min="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchFirstProSub('forward')">正向算分</button>
+      <button class="sub-tab" onclick="switchFirstProSub('reverse')">目标反算</button>
+    </div>
+
+    <div id="first-pro-forward" class="sub-mode active">
+      <div class="card">
+        <h2><span class="icon">📝</span>期末考试成绩</h2>
+        <div class="input-row">
+          <div class="input-group" style="max-width:300px">
+            <label style="color:var(--gold)">期末考试成绩</label>
+            <input type="number" id="first-pro-exam" class="exam" placeholder="例: 50000" value="50000" step="100" min="0">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2><span class="icon">🏆</span>最终评分</h2>
+        <div class="result-big">
+          <div class="final-score" id="first-pro-total">--</div>
+          <div class="grade-badge grade-norank" id="first-pro-grade">--</div>
+          <div class="final-label">公式：属性总和 × 2.3 + 期末考试成绩评分</div>
+        </div>
+        <div class="bar-chart" id="first-pro-bar"></div>
+        <div class="breakdown" id="first-pro-breakdown"></div>
+        <div class="break-formula" id="first-pro-formula"></div>
+        <div class="grade-scale" id="first-pro-gradescale"></div>
+        <div class="exam-eval" id="first-pro-eval-detail"></div>
+      </div>
+    </div>
+
+    <div id="first-pro-reverse" class="sub-mode">
+      <div class="card">
+        <h2><span class="icon">🎯</span>各评级所需期末考试成绩</h2>
+        <p style="font-size:0.82em;color:var(--text2);margin-bottom:12px">根据当前属性，反算达成各评级所需的期末考试成绩</p>
+        <div id="first-pro-target-table"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="collapsible" onclick="toggleCollapse(this)"><span class="icon">📋</span>pro 考试评分对照表（点击展开）</h2>
+      <div class="coll-content hidden" style="max-height:300px">
+        <table class="ref-table">
+          <thead><tr><th>期末考试成绩</th><th>评分计算</th></tr></thead>
+          <tbody>
+            <tr><td>~ 10,000</td><td>2,250（固定）</td></tr>
+            <tr><td>10,000 以上</td><td>2,250 + (分数 − 10,000) × 0.08</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer id="footer">
+  数据来源：bilibili@優奈 &nbsp;|&nbsp; 公式：[いおん]【#学マス】H.I.F編 S4+への道
+</footer>
+
+</div>
+
+<script>
+let currentMode = 'hif';
+
+// ==================== HIF CALCULATIONS ====================
+
+function getGrade(score) {
+  if (score >= 35000) return { text: 'S5',    cls: 'grade-s5' };
+  if (score >= 30000) return { text: 'S4+',   cls: 'grade-s4p' };
+  if (score >= 26000) return { text: 'S4',    cls: 'grade-s4' };
+  if (score >= 23000) return { text: 'SSS+',  cls: 'grade-sssp' };
+  if (score >= 20000) return { text: 'SSS',   cls: 'grade-sss' };
+  if (score >= 18000) return { text: 'SS+',   cls: 'grade-ssp' };
+  if (score >= 16000) return { text: 'SS',    cls: 'grade-ss' };
+  if (score >= 14500) return { text: 'S+',    cls: 'grade-sp' };
+  if (score >= 13000) return { text: 'S',     cls: 'grade-s' };
+  if (score >= 11500) return { text: 'A+',    cls: 'grade-ap' };
+  return { text: '未达标', cls: 'grade-norank' };
+}
+
+var GRADE_LIST = [
+  { text: 'A+',  min: 11500, cls: 'grade-ap' },
+  { text: 'S',   min: 13000, cls: 'grade-s' },
+  { text: 'S+',  min: 14500, cls: 'grade-sp' },
+  { text: 'SS',  min: 16000, cls: 'grade-ss' },
+  { text: 'SS+', min: 18000, cls: 'grade-ssp' },
+  { text: 'SSS', min: 20000, cls: 'grade-sss' },
+  { text: 'SSS+',min: 23000, cls: 'grade-sssp' },
+  { text: 'S4',  min: 26000, cls: 'grade-s4' },
+  { text: 'S4+', min: 30000, cls: 'grade-s4p' },
+  { text: 'S5',  min: 35000, cls: 'grade-s5' },
+];
+
+function renderGradeScale(containerId, score) {
+  var html = '';
+  var activeIdx = -1;
+  for (var i = 0; i < GRADE_LIST.length; i++) {
+    if (score >= GRADE_LIST[i].min) activeIdx = i;
+  }
+  for (var i = 0; i < GRADE_LIST.length; i++) {
+    var g = GRADE_LIST[i];
+    var cls = 'grade-scale-item ' + g.cls;
+    if (i === activeIdx) cls += ' current';
+    else cls += ' dim';
+    html += '<div class="' + cls + '" title="' + g.text + ': ≥' + g.min.toLocaleString() + '">' + g.text + '</div>';
+  }
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function calcHifBattle1(scoreWan) {
+  const s = scoreWan;
+  if (s <= 30) return 0;
+  if (s <= 70) return (s - 30) * 10000 * 0.01;
+  if (s <= 100) return 4000 + (s - 70) * 10000 * 0.003;
+  if (s <= 120) return 4900 + (s - 100) * 10000 * 0.002;
+  if (s <= 140) return 5300 + (s - 120) * 10000 * 0.001;
+  return 5500;
+}
+
+function calcHifBattle2(scoreWan) {
+  var s = scoreWan;
+  if (s <= 60) return 0;
+  if (s <= 90) return (s - 60) * 10000 * 0.004;
+  if (s <= 150) return 1200 + (s - 90) * 10000 * 0.008;
+  if (s <= 200) return 6000 + (s - 150) * 10000 * 0.002;
+  if (s <= 240) return 7000 + (s - 200) * 10000 * 0.001;
+  return 7400;
+}
+
+// Reverse: given needed eval, find required 本战2 score (raw number)
+function reverseBattle2Eval(neededEval) {
+  if (neededEval <= 0) return 0;
+  if (neededEval <= 1200) return Math.round((60 + neededEval / 40) * 10000);
+  if (neededEval <= 6000) return Math.round((90 + (neededEval - 1200) / 80) * 10000);
+  if (neededEval <= 7000) return Math.round((150 + (neededEval - 6000) / 20) * 10000);
+  if (neededEval <= 7400) return Math.round((200 + (neededEval - 7000) / 10) * 10000);
+  return Infinity;
+}
+
+function getHifB1Range(s) {
+  if (s <= 30) return '0~30万';
+  if (s <= 70) return '30~70万';
+  if (s <= 100) return '70~100万';
+  if (s <= 120) return '100~120万';
+  if (s <= 140) return '120~140万';
+  return '140万+';
+}
+
+function getHifB2Range(s) {
+  if (s <= 60) return '0~60万';
+  if (s <= 90) return '60~90万';
+  if (s <= 150) return '90~150万';
+  if (s <= 200) return '150~200万';
+  if (s <= 240) return '200~240万';
+  return '240万+';
+}
+
+function updateHifForward() {
+  var vo = parseFloat(document.getElementById('hif-vo').value) || 0;
+  var da = parseFloat(document.getElementById('hif-da').value) || 0;
+  var vi = parseFloat(document.getElementById('hif-vi').value) || 0;
+  var b1 = parseFloat(document.getElementById('hif-b1').value) || 0;
+  var b2 = parseFloat(document.getElementById('hif-b2').value) || 0;
+  var star = parseFloat(document.getElementById('hif-star').value) || 0;
+
+  if (vo > 3200 || da > 3200 || vi > 3200) {
+    document.getElementById('hif-final').textContent = '错误';
+    document.getElementById('hif-grade').textContent = '属性超限';
+    document.getElementById('hif-grade').className = 'grade-badge grade-norank';
+    document.getElementById('hif-formula').innerHTML = '<span style=\"color:var(--accent)\">属性值超出上限 3200，请修正后重试</span>';
+    document.getElementById('hif-breakdown').innerHTML = '';
+    document.getElementById('hif-bar').innerHTML = '';
+    document.getElementById('hif-eval-detail').innerHTML = '';
+    document.getElementById('hif-gradescale').innerHTML = '';
+    return;
+  }
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2;
+  var starScore = star * 7.5;
+  var b1Eval = calcHifBattle1(b1);
+  var b2Eval = calcHifBattle2(b2);
+  var battleEval = b1Eval + b2Eval;
+  var finalScore = attrScore + starScore + battleEval - 2000;
+
+  var hifGrade = getGrade(finalScore);
+  document.getElementById('hif-final').textContent = Math.round(finalScore).toLocaleString();
+  var hifBadge = document.getElementById('hif-grade');
+  hifBadge.textContent = hifGrade.text;
+  hifBadge.className = 'grade-badge ' + hifGrade.cls;
+  renderGradeScale('hif-gradescale', finalScore);
+
+  document.getElementById('hif-formula').innerHTML =
+    '(' + attrSum.toLocaleString() + ' × 2) + (' + star + ' × 7.5) + (' + Math.round(b1Eval).toLocaleString() + ' + ' + Math.round(b2Eval).toLocaleString() + ') − 2000 = <b>' + Math.round(finalScore).toLocaleString() + '</b>';
+
+  var maxVal = Math.max(attrScore, starScore, b1Eval, b2Eval, 2000);
+
+  document.getElementById('hif-breakdown').innerHTML =
+    '<div class="break-item"><div class="val">' + Math.round(attrScore).toLocaleString() + '</div><div class="lbl">属性得分 (总和×2)</div><div class="lbl">Vo+Da+Vi = ' + attrSum.toLocaleString() + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(starScore).toLocaleString() + '</div><div class="lbl">星耀值得分 (×7.5)</div><div class="lbl">星耀值 = ' + star + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(b1Eval).toLocaleString() + '</div><div class="lbl">本战1评价值</div><div class="lbl">区间: ' + getHifB1Range(b1) + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(b2Eval).toLocaleString() + '</div><div class="lbl">本战2评价值</div><div class="lbl">区间: ' + getHifB2Range(b2) + '</div></div>' +
+    '<div class="break-item"><div class="val" style="color:var(--accent)">−2,000</div><div class="lbl">固定扣分</div></div>';
+
+  document.getElementById('hif-bar').innerHTML =
+    '<div class="bar-row"><div class="bar-label">属性得分</div><div class="bar-track"><div class="bar-fill attr" style="width:' + (attrScore/maxVal*100).toFixed(1) + '%">' + Math.round(attrScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">星耀值</div><div class="bar-track"><div class="bar-fill star" style="width:' + (starScore/maxVal*100).toFixed(1) + '%">' + Math.round(starScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">本战1</div><div class="bar-track"><div class="bar-fill exam1" style="width:' + (b1Eval/maxVal*100).toFixed(1) + '%">' + Math.round(b1Eval).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">本战2</div><div class="bar-track"><div class="bar-fill exam2" style="width:' + (b2Eval/maxVal*100).toFixed(1) + '%">' + Math.round(b2Eval).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">固定扣分</div><div class="bar-track"><div class="bar-fill penalty" style="width:' + (2000/maxVal*100).toFixed(1) + '%">−2,000</div></div></div>';
+
+  document.getElementById('hif-eval-detail').innerHTML =
+    '本战1: ' + b1 + '万 → <span>' + getHifB1Range(b1) + '</span> → 评价值 <span>' + Math.round(b1Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '本战2: ' + b2 + '万 → <span>' + getHifB2Range(b2) + '</span> → 评价值 <span>' + Math.round(b2Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '本战评价值合计: <span>' + Math.round(battleEval).toLocaleString() + '</span>';
+}
+
+function updateHifReverse() {
+  var vo = parseFloat(document.getElementById('hif-vo').value) || 0;
+  var da = parseFloat(document.getElementById('hif-da').value) || 0;
+  var vi = parseFloat(document.getElementById('hif-vi').value) || 0;
+  var b1 = parseFloat(document.getElementById('hif-b1').value) || 0;
+  var star = parseFloat(document.getElementById('hif-star').value) || 0;
+
+  if (vo > 3200 || da > 3200 || vi > 3200) {
+    document.getElementById('hif-target-table').innerHTML = '<p style=\"color:var(--accent);text-align:center;padding:16px\">属性值超出上限 3200，请修正后重试</p>';
+    document.getElementById('hif-target-max').innerHTML = '';
+    return;
+  }
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2;
+  var starScore = star * 7.5;
+  var b1Eval = calcHifBattle1(b1);
+  var baseScore = attrScore + starScore + b1Eval - 2000;
+  var maxB2Eval = 7400;
+  var maxB1Eval = 5500;
+  var theoreticalMax = Math.floor(attrScore + starScore + maxB1Eval + maxB2Eval - 2000);
+  var currentMax = Math.floor(attrScore + starScore + b1Eval + maxB2Eval - 2000);
+
+  document.getElementById('hif-target-max').innerHTML =
+    '理论上限（本战1满分+本战2满分）：<b>' + theoreticalMax.toLocaleString() + '</b> &nbsp;|&nbsp; 当前本战1下可达上限：<b>' + currentMax.toLocaleString() + '</b>';
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需本战2得分</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededEval = t.min - baseScore;
+    var neededB2Score = reverseBattle2Eval(neededEval);
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+
+    if (neededB2Score === Infinity) {
+      html += '<td style="color:var(--accent)">—</td>';
+      html += '<td style="color:var(--accent)">❌ 无法达成</td>';
+    } else if (neededB2Score <= 0) {
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + neededB2Score.toLocaleString() + '</td>';
+      html += '<td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('hif-target-table').innerHTML = html;
+}
+
+function updateHifAll() {
+  if (hifSubMode === 'forward') updateHifForward();
+  else updateHifReverse();
+}
+
+function updateHif() {
+  updateHifAll();
+}
+
+// ==================== NEW SCENARIO CALCULATIONS ====================
+
+function calcMidtermEval(score) {
+  const s = score;
+  if (s <= 30000) return 2400;
+  if (s <= 40000) return 2400 + (s - 30000) * 0.008;
+  if (s <= 50000) return 2480 + (s - 40000) * 0.003;
+  if (s <= 60000) return 2510 + (s - 50000) * 0.002;
+  if (s <= 200000) return 2530 + (s - 60000) * 0.001;
+  return 2670;
+}
+
+function calcFinalExamEval(score) {
+  const s = score;
+  if (s <= 400000) return 7200;
+  if (s <= 500000) return 7200 + (s - 400000) * 0.01;
+  if (s <= 600000) return 8200 + (s - 500000) * 0.008;
+  if (s <= 2000000) return 9000 + (s - 600000) * 0.001;
+  return 10400;
+}
+
+// Reverse: given needed eval, find required final exam score
+function reverseFinalExamEval(neededEval) {
+  if (neededEval <= 7200) return 0;
+  if (neededEval <= 8200) return Math.ceil(400000 + (neededEval - 7200) / 0.01);
+  if (neededEval <= 9000) return Math.ceil(500000 + (neededEval - 8200) / 0.008);
+  if (neededEval <= 10400) return Math.ceil(600000 + (neededEval - 9000) / 0.001);
+  return Infinity; // impossible
+}
+
+function getMidtermRange(s) {
+  if (s <= 30000) return '~30,000';
+  if (s <= 40000) return '30,000~40,000';
+  if (s <= 50000) return '40,000~50,000';
+  if (s <= 60000) return '50,000~60,000';
+  if (s <= 200000) return '60,000~200,000';
+  return '200,000+（上限）';
+}
+
+function getFinalExamRange(s) {
+  if (s <= 400000) return '~400,000';
+  if (s <= 500000) return '400,000~500,000';
+  if (s <= 600000) return '500,000~600,000';
+  if (s <= 2000000) return '600,000~2,000,000';
+  return '2,000,000+（上限）';
+}
+
+function updateNewForward() {
+  var vo = parseFloat(document.getElementById('new-vo').value) || 0;
+  var da = parseFloat(document.getElementById('new-da').value) || 0;
+  var vi = parseFloat(document.getElementById('new-vi').value) || 0;
+  var mid = parseFloat(document.getElementById('new-mid').value) || 0;
+  var fin = parseFloat(document.getElementById('new-final').value) || 0;
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2.1;
+  var midEval = calcMidtermEval(mid);
+  var finEval = calcFinalExamEval(fin);
+  var examTotal = midEval + finEval;
+  var finalScore = attrScore + examTotal;
+
+  var newGrade = getGrade(finalScore);
+  document.getElementById('new-total').textContent = Math.round(finalScore).toLocaleString();
+  var newBadge = document.getElementById('new-grade');
+  newBadge.textContent = newGrade.text;
+  newBadge.className = 'grade-badge ' + newGrade.cls;
+  renderGradeScale('new-gradescale', finalScore);
+
+  document.getElementById('new-formula').innerHTML =
+    '(' + attrSum.toLocaleString() + ' × 2.1) + (' + Math.round(midEval).toLocaleString() + ' + ' + Math.round(finEval).toLocaleString() + ') = <b>' + Math.round(finalScore).toLocaleString() + '</b>';
+
+  var maxVal = Math.max(attrScore, midEval, finEval);
+
+  document.getElementById('new-breakdown').innerHTML =
+    '<div class="break-item"><div class="val">' + Math.round(attrScore).toLocaleString() + '</div><div class="lbl">属性得分 (总和×2.1)</div><div class="lbl">Vo+Da+Vi = ' + attrSum.toLocaleString() + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(midEval).toLocaleString() + '</div><div class="lbl">中間試験 评价值</div><div class="lbl">区间: ' + getMidtermRange(mid) + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(finEval).toLocaleString() + '</div><div class="lbl">最終試験 评价值</div><div class="lbl">区间: ' + getFinalExamRange(fin) + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(examTotal).toLocaleString() + '</div><div class="lbl">考试评价值合计</div></div>';
+
+  document.getElementById('new-bar').innerHTML =
+    '<div class="bar-row"><div class="bar-label">属性得分</div><div class="bar-track"><div class="bar-fill attr" style="width:' + (attrScore/maxVal*100).toFixed(1) + '%">' + Math.round(attrScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">中間試験</div><div class="bar-track"><div class="bar-fill exam1" style="width:' + (midEval/maxVal*100).toFixed(1) + '%">' + Math.round(midEval).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">最終試験</div><div class="bar-track"><div class="bar-fill exam2" style="width:' + (finEval/maxVal*100).toFixed(1) + '%">' + Math.round(finEval).toLocaleString() + '</div></div></div>';
+
+  document.getElementById('new-eval-detail').innerHTML =
+    '中間試験: ' + mid.toLocaleString() + ' → <span>' + getMidtermRange(mid) + '</span> → 评价值 <span>' + Math.round(midEval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '最終試験: ' + fin.toLocaleString() + ' → <span>' + getFinalExamRange(fin) + '</span> → 评价值 <span>' + Math.round(finEval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '考试评价值合计: <span>' + Math.round(examTotal).toLocaleString() + '</span>';
+}
+
+function updateNewReverse() {
+  var vo = parseFloat(document.getElementById('new-vo').value) || 0;
+  var da = parseFloat(document.getElementById('new-da').value) || 0;
+  var vi = parseFloat(document.getElementById('new-vi').value) || 0;
+  var mid = parseFloat(document.getElementById('new-mid').value) || 0;
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2.1;
+  var midEval = calcMidtermEval(mid);
+
+  var maxFinalEval = 10400;
+  var maxMidEval = 2670;
+  var theoreticalMax = Math.floor(attrScore + maxMidEval + maxFinalEval);
+  var currentMax = Math.floor(attrScore + midEval + maxFinalEval);
+  document.getElementById('new-target-max').innerHTML =
+    '理论上限（期中满分+期末满分）：<b>' + theoreticalMax.toLocaleString() + '</b> &nbsp;|&nbsp; 当前期中下可达上限：<b>' + currentMax.toLocaleString() + '</b>';
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需期末得分</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededEval = t.min - attrScore - midEval;
+    var neededScore = reverseFinalExamEval(neededEval);
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+
+    if (neededScore === Infinity) {
+      html += '<td style="color:var(--accent)">—</td>';
+      html += '<td style="color:var(--accent)">❌ 无法达成</td>';
+    } else if (neededScore <= 0) {
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + neededScore.toLocaleString() + '</td>';
+      html += '<td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('new-target-table').innerHTML = html;
+}
+
+function updateNewAttr() {
+  var mid = parseFloat(document.getElementById('new-attr-mid').value) || 0;
+  var fin = parseFloat(document.getElementById('new-attr-fin').value) || 0;
+
+  var midEval = calcMidtermEval(mid);
+  var finEval = calcFinalExamEval(fin);
+  var examTotal = midEval + finEval;
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需属性合计</th><th>所需单属性均值</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededAttr = (t.min - examTotal) / 2.1;
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+
+    if (neededAttr <= 0) {
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + Math.ceil(neededAttr).toLocaleString() + '</td>';
+      html += '<td>' + Math.ceil(neededAttr / 3).toLocaleString() + '</td>';
+      html += '<td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('new-attr-table').innerHTML = html;
+
+  var maxMidEval = 2670;
+  var maxFinEval = 10400;
+  var theoreticalMax = Math.floor((maxMidEval + maxFinEval) * 2.1) || 0;
+  document.getElementById('new-attr-note').innerHTML =
+    '考試评价值合计：<b>' + Math.round(examTotal).toLocaleString() + '</b>（中間 ' + Math.round(midEval).toLocaleString() + ' + 最終 ' + Math.round(finEval).toLocaleString() + '）&nbsp;|&nbsp;公式：所需属性合计 = (评级线 − 考试评价值合计) ÷ 2.1';
+}
+
+function updateNewAll() {
+  if (newSubMode === 'forward') updateNewForward();
+  else if (newSubMode === 'reverse') updateNewReverse();
+  else updateNewAttr();
+}
+
+function updateNew() {
+  updateNewAll();
+}
+
+// ==================== MODE SWITCHING ====================
+
+var newSubMode = 'forward';
+var hifSubMode = 'forward';
+
+// ==================== NIA CALCULATIONS ====================
+
+var niaProSub = 'forward';
+var niaMasSub = 'forward';
+var niaDiff = 'pro';
+
+// ===== PRO difficulty =====
+
+var NIA_PRO_RANKS = [
+  { rank: '-',  maxVotes: 20000,  a: 0.10,  b: 0 },
+  { rank: 'A',  maxVotes: 40000,  a: 0.085, b: 0 },
+  { rank: 'A+', maxVotes: 60000,  a: 0.07,  b: 900 },
+  { rank: 'S',  maxVotes: 80000,  a: 0.065, b: 1200 },
+  { rank: 'S+', maxVotes: 100000, a: 0.06,  b: 1600 },
+  { rank: 'SS', maxVotes: Infinity,a: 0.055, b: 2100 },
+];
+
+function getNiaProParams(votes) {
+  for (var i = 0; i < NIA_PRO_RANKS.length; i++) {
+    if (votes <= NIA_PRO_RANKS[i].maxVotes) return NIA_PRO_RANKS[i];
+  }
+  return NIA_PRO_RANKS[NIA_PRO_RANKS.length - 1];
+}
+
+function updateNiaProForward() {
+  var vo = parseFloat(document.getElementById('nia-pro-vo').value) || 0;
+  var da = parseFloat(document.getElementById('nia-pro-da').value) || 0;
+  var vi = parseFloat(document.getElementById('nia-pro-vi').value) || 0;
+  var votes = parseFloat(document.getElementById('nia-pro-votes').value) || 0;
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2.3;
+  var p = getNiaProParams(votes);
+  var voteScore = votes * p.a + p.b;
+  var finalScore = attrScore + voteScore;
+
+  var grade = getGrade(finalScore);
+  document.getElementById('nia-pro-total').textContent = Math.round(finalScore).toLocaleString();
+  var badge = document.getElementById('nia-pro-grade');
+  badge.textContent = grade.text;
+  badge.className = 'grade-badge ' + grade.cls;
+  renderGradeScale('nia-pro-gradescale', finalScore);
+
+  document.getElementById('nia-pro-formula').innerHTML =
+    '(' + attrSum.toLocaleString() + ' × 2.3) + (' + votes.toLocaleString() + ' × ' + (p.a*100) + '% + ' + p.b.toLocaleString() + ') = <b>' + Math.round(finalScore).toLocaleString() + '</b>';
+
+  var maxVal = Math.max(attrScore, voteScore);
+  document.getElementById('nia-pro-breakdown').innerHTML =
+    '<div class="break-item"><div class="val">' + Math.round(attrScore).toLocaleString() + '</div><div class="lbl">属性得分 (总和×2.3)</div><div class="lbl">Vo+Da+Vi = ' + attrSum.toLocaleString() + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(voteScore).toLocaleString() + '</div><div class="lbl">粉丝数评分</div><div class="lbl">Rank: ' + p.rank + ' (a=' + (p.a*100) + '%, b=' + p.b.toLocaleString() + ')</div></div>';
+
+  document.getElementById('nia-pro-bar').innerHTML =
+    '<div class="bar-row"><div class="bar-label">属性得分</div><div class="bar-track"><div class="bar-fill attr" style="width:' + (attrScore/maxVal*100).toFixed(1) + '%">' + Math.round(attrScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">粉丝评分</div><div class="bar-track"><div class="bar-fill exam1" style="width:' + (voteScore/maxVal*100).toFixed(1) + '%">' + Math.round(voteScore).toLocaleString() + '</div></div></div>';
+
+  document.getElementById('nia-pro-eval-detail').innerHTML =
+    '粉丝投票数: ' + votes.toLocaleString() + ' → Rank <span>' + p.rank + '</span> → a=' + (p.a*100) + '% b=' + p.b.toLocaleString() + ' → 粉丝数评分 <span>' + Math.round(voteScore).toLocaleString() + '</span>';
+}
+
+function reverseNiaProVotes(neededVoteScore) {
+  if (neededVoteScore <= 0) return 0;
+  var best = Infinity;
+  for (var i = 0; i < NIA_PRO_RANKS.length; i++) {
+    var p = NIA_PRO_RANKS[i];
+    var votes = Math.ceil((neededVoteScore - p.b) / p.a);
+    var minVotes = (i === 0) ? 0 : NIA_PRO_RANKS[i-1].maxVotes + 1;
+    if (votes < minVotes) votes = minVotes;
+    if (votes <= p.maxVotes && votes < best) best = votes;
+  }
+  return best === Infinity ? 0 : best;
+}
+
+function updateNiaProReverse() {
+  var vo = parseFloat(document.getElementById('nia-pro-vo').value) || 0;
+  var da = parseFloat(document.getElementById('nia-pro-da').value) || 0;
+  var vi = parseFloat(document.getElementById('nia-pro-vi').value) || 0;
+  var attrScore = (vo + da + vi) * 2.3;
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需粉丝投票数</th><th>对应Rank</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededVoteScore = t.min - attrScore;
+    var neededVotes = reverseNiaProVotes(neededVoteScore);
+    var rankInfo = neededVotes > 0 ? getNiaProParams(neededVotes) : null;
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+
+    if (neededVotes <= 0) {
+      html += '<td style="color:#2ecc71">0</td><td style="color:#2ecc71">-</td><td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + neededVotes.toLocaleString() + '</td>';
+      html += '<td>' + (rankInfo ? rankInfo.rank : '-') + '</td>';
+      html += '<td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('nia-pro-target-table').innerHTML = html;
+}
+
+function updateNiaProAll() {
+  if (niaProSub === 'forward') updateNiaProForward();
+  else updateNiaProReverse();
+}
+
+function switchNiaProSub(sub) {
+  niaProSub = sub;
+  document.getElementById('nia-pro-forward').classList.remove('active');
+  document.getElementById('nia-pro-reverse').classList.remove('active');
+  var tabs = document.querySelectorAll('#nia-diff-pro .sub-tabs .sub-tab');
+  tabs[0].classList.remove('active');
+  tabs[1].classList.remove('active');
+  if (sub === 'forward') {
+    document.getElementById('nia-pro-forward').classList.add('active');
+    tabs[0].classList.add('active');
+    updateNiaProForward();
+  } else {
+    document.getElementById('nia-pro-reverse').classList.add('active');
+    tabs[1].classList.add('active');
+    updateNiaProReverse();
+  }
+}
+
+// ===== MASTER difficulty =====
+
+function getNiaMasParams(votes) {
+  if (votes < 120000) return { a: 0.05, b: 2600, range: '100,000~120,000' };
+  if (votes < 140000) return { a: 0.04, b: 3800, range: '120,000~140,000' };
+  return { a: 0.03, b: 5200, range: '140,000以上' };
+}
+
+function updateNiaMasForward() {
+  var vo = parseFloat(document.getElementById('nia-mas-vo').value) || 0;
+  var da = parseFloat(document.getElementById('nia-mas-da').value) || 0;
+  var vi = parseFloat(document.getElementById('nia-mas-vi').value) || 0;
+  var votes = parseFloat(document.getElementById('nia-mas-votes').value) || 0;
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2.3;
+  var p = getNiaMasParams(votes);
+  var voteScore = votes * p.a + p.b;
+  var finalScore = attrScore + voteScore;
+
+  var grade = getGrade(finalScore);
+  document.getElementById('nia-mas-total').textContent = Math.round(finalScore).toLocaleString();
+  var badge = document.getElementById('nia-mas-grade');
+  badge.textContent = grade.text;
+  badge.className = 'grade-badge ' + grade.cls;
+  renderGradeScale('nia-mas-gradescale', finalScore);
+
+  document.getElementById('nia-mas-formula').innerHTML =
+    '(' + attrSum.toLocaleString() + ' × 2.3) + (' + votes.toLocaleString() + ' × ' + (p.a*100) + '% + ' + p.b.toLocaleString() + ') = <b>' + Math.round(finalScore).toLocaleString() + '</b>';
+
+  var maxVal = Math.max(attrScore, voteScore);
+  document.getElementById('nia-mas-breakdown').innerHTML =
+    '<div class="break-item"><div class="val">' + Math.round(attrScore).toLocaleString() + '</div><div class="lbl">属性得分 (总和×2.3)</div><div class="lbl">Vo+Da+Vi = ' + attrSum.toLocaleString() + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(voteScore).toLocaleString() + '</div><div class="lbl">投票得分</div><div class="lbl">区间: ' + p.range + ' (a=' + (p.a*100) + '%, b=' + p.b.toLocaleString() + ')</div></div>';
+
+  document.getElementById('nia-mas-bar').innerHTML =
+    '<div class="bar-row"><div class="bar-label">属性得分</div><div class="bar-track"><div class="bar-fill attr" style="width:' + (attrScore/maxVal*100).toFixed(1) + '%">' + Math.round(attrScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">投票得分</div><div class="bar-track"><div class="bar-fill exam1" style="width:' + (voteScore/maxVal*100).toFixed(1) + '%">' + Math.round(voteScore).toLocaleString() + '</div></div></div>';
+
+  document.getElementById('nia-mas-eval-detail').innerHTML =
+    '投票数: ' + votes.toLocaleString() + ' → <span>' + p.range + '</span> → a=' + (p.a*100) + '% b=' + p.b.toLocaleString() + ' → 投票得分 <span>' + Math.round(voteScore).toLocaleString() + '</span>';
+}
+
+function reverseNiaMasVotes(neededVoteScore) {
+  if (neededVoteScore <= 0) return 0;
+  if (neededVoteScore <= 8600) return Math.max(100000, Math.ceil((neededVoteScore - 2600) / 0.05));
+  if (neededVoteScore <= 9400) return Math.max(120000, Math.ceil((neededVoteScore - 3800) / 0.04));
+  return Math.max(140000, Math.ceil((neededVoteScore - 5200) / 0.03));
+}
+
+function updateNiaMasReverse() {
+  var vo = parseFloat(document.getElementById('nia-mas-vo').value) || 0;
+  var da = parseFloat(document.getElementById('nia-mas-da').value) || 0;
+  var vi = parseFloat(document.getElementById('nia-mas-vi').value) || 0;
+  var attrScore = (vo + da + vi) * 2.3;
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需投票数</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededVoteScore = t.min - attrScore;
+    var neededVotes = reverseNiaMasVotes(neededVoteScore);
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+    if (neededVotes <= 0) {
+      html += '<td style="color:#2ecc71">0</td><td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + neededVotes.toLocaleString() + '</td><td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('nia-mas-target-table').innerHTML = html;
+}
+
+function updateNiaMasAll() {
+  if (niaMasSub === 'forward') updateNiaMasForward();
+  else updateNiaMasReverse();
+}
+
+function switchNiaMasSub(sub) {
+  niaMasSub = sub;
+  document.getElementById('nia-mas-forward').classList.remove('active');
+  document.getElementById('nia-mas-reverse').classList.remove('active');
+  var tabs = document.querySelectorAll('#nia-diff-master .sub-tabs .sub-tab');
+  tabs[0].classList.remove('active');
+  tabs[1].classList.remove('active');
+  if (sub === 'forward') {
+    document.getElementById('nia-mas-forward').classList.add('active');
+    tabs[0].classList.add('active');
+    updateNiaMasForward();
+  } else {
+    document.getElementById('nia-mas-reverse').classList.add('active');
+    tabs[1].classList.add('active');
+    updateNiaMasReverse();
+  }
+}
+
+function updateNiaAll() {
+  if (niaDiff === 'pro') updateNiaProAll();
+  else updateNiaMasAll();
+}
+
+function switchNiaDiff(diff) {
+  niaDiff = diff;
+  document.getElementById('nia-diff-pro').classList.remove('active');
+  document.getElementById('nia-diff-master').classList.remove('active');
+  var diffTabs = document.querySelectorAll('#mode-nia > .sub-tabs .sub-tab');
+  diffTabs[0].classList.remove('active');
+  diffTabs[1].classList.remove('active');
+  if (diff === 'pro') {
+    document.getElementById('nia-diff-pro').classList.add('active');
+    diffTabs[0].classList.add('active');
+    updateNiaProAll();
+  } else {
+    document.getElementById('nia-diff-master').classList.add('active');
+    diffTabs[1].classList.add('active');
+    updateNiaMasAll();
+  }
+}
+
+// ==================== 初剧本 CALCULATIONS ====================
+
+var firstProSub = 'forward';
+
+function calcFirstExamScore(exam) {
+  if (exam <= 10000) return 2250;
+  return 2250 + (exam - 10000) * 0.08;
+}
+
+function reverseFirstExam(neededExamScore) {
+  if (neededExamScore <= 0) return 0;
+  if (neededExamScore <= 2250) return 0;
+  return Math.ceil(10000 + (neededExamScore - 2250) / 0.08);
+}
+
+function updateFirstProForward() {
+  var vo = parseFloat(document.getElementById('first-pro-vo').value) || 0;
+  var da = parseFloat(document.getElementById('first-pro-da').value) || 0;
+  var vi = parseFloat(document.getElementById('first-pro-vi').value) || 0;
+  var exam = parseFloat(document.getElementById('first-pro-exam').value) || 0;
+
+  var attrSum = vo + da + vi;
+  var attrScore = attrSum * 2.3;
+  var examScore = calcFirstExamScore(exam);
+  var finalScore = attrScore + examScore;
+
+  var grade = getGrade(finalScore);
+  document.getElementById('first-pro-total').textContent = Math.round(finalScore).toLocaleString();
+  var badge = document.getElementById('first-pro-grade');
+  badge.textContent = grade.text;
+  badge.className = 'grade-badge ' + grade.cls;
+  renderGradeScale('first-pro-gradescale', finalScore);
+
+  document.getElementById('first-pro-formula').innerHTML =
+    '(' + attrSum.toLocaleString() + ' × 2.3) + ' + Math.round(examScore).toLocaleString() + ' = <b>' + Math.round(finalScore).toLocaleString() + '</b>';
+
+  var maxVal = Math.max(attrScore, examScore);
+  document.getElementById('first-pro-breakdown').innerHTML =
+    '<div class="break-item"><div class="val">' + Math.round(attrScore).toLocaleString() + '</div><div class="lbl">属性得分 (总和×2.3)</div><div class="lbl">Vo+Da+Vi = ' + attrSum.toLocaleString() + '</div></div>' +
+    '<div class="break-item"><div class="val">' + Math.round(examScore).toLocaleString() + '</div><div class="lbl">期末考试成绩评分</div><div class="lbl">' + (exam <= 10000 ? '≤10,000 (固定2,250)' : '2,250 + (' + exam.toLocaleString() + ' − 10,000) × 0.08') + '</div></div>';
+
+  document.getElementById('first-pro-bar').innerHTML =
+    '<div class="bar-row"><div class="bar-label">属性得分</div><div class="bar-track"><div class="bar-fill attr" style="width:' + (attrScore/maxVal*100).toFixed(1) + '%">' + Math.round(attrScore).toLocaleString() + '</div></div></div>' +
+    '<div class="bar-row"><div class="bar-label">考试评分</div><div class="bar-track"><div class="bar-fill exam1" style="width:' + (examScore/maxVal*100).toFixed(1) + '%">' + Math.round(examScore).toLocaleString() + '</div></div></div>';
+
+  document.getElementById('first-pro-eval-detail').innerHTML =
+    '期末考试成绩: ' + exam.toLocaleString() + ' → 评分 <span>' + Math.round(examScore).toLocaleString() + '</span>';
+}
+
+function updateFirstProReverse() {
+  var vo = parseFloat(document.getElementById('first-pro-vo').value) || 0;
+  var da = parseFloat(document.getElementById('first-pro-da').value) || 0;
+  var vi = parseFloat(document.getElementById('first-pro-vi').value) || 0;
+  var attrScore = (vo + da + vi) * 2.3;
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需期末考试成绩</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededExamScore = t.min - attrScore;
+    var neededExam = reverseFirstExam(neededExamScore);
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+    if (neededExam <= 0 && neededExamScore <= 2250) {
+      html += '<td style="color:#2ecc71">0</td><td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + neededExam.toLocaleString() + '</td><td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('first-pro-target-table').innerHTML = html;
+}
+
+function updateFirstProAll() {
+  if (firstProSub === 'forward') updateFirstProForward();
+  else updateFirstProReverse();
+}
+
+function switchFirstProSub(sub) {
+  firstProSub = sub;
+  document.getElementById('first-pro-forward').classList.remove('active');
+  document.getElementById('first-pro-reverse').classList.remove('active');
+  var tabs = document.querySelectorAll('#first-diff-pro .sub-tabs .sub-tab');
+  tabs[0].classList.remove('active');
+  tabs[1].classList.remove('active');
+  if (sub === 'forward') {
+    document.getElementById('first-pro-forward').classList.add('active');
+    tabs[0].classList.add('active');
+    updateFirstProForward();
+  } else {
+    document.getElementById('first-pro-reverse').classList.add('active');
+    tabs[1].classList.add('active');
+    updateFirstProReverse();
+  }
+}
+
+function switchFirstDiff(diff) { /* placeholder */ }
+
+function updateHifAttr() {
+  var b1 = parseFloat(document.getElementById('hif-attr-b1').value) || 0;
+  var b2 = parseFloat(document.getElementById('hif-attr-b2').value) || 0;
+  var star = parseFloat(document.getElementById('hif-attr-star').value) || 0;
+
+  var b1Eval = calcHifBattle1(b1);
+  var b2Eval = calcHifBattle2(b2);
+  var battleEval = b1Eval + b2Eval;
+  var starScore = star * 7.5;
+  var fixedScore = starScore + battleEval - 2000;
+
+  var targets = [
+    { grade: 'A+',  min: 11500 },
+    { grade: 'S',   min: 13000 },
+    { grade: 'S+',  min: 14500 },
+    { grade: 'SS',  min: 16000 },
+    { grade: 'SS+', min: 18000 },
+    { grade: 'SSS', min: 20000 },
+    { grade: 'SSS+',min: 23000 },
+    { grade: 'S4',  min: 26000 },
+    { grade: 'S4+', min: 30000 },
+    { grade: 'S5',  min: 35000 },
+  ];
+
+  var html = '<div class="table-wrap"><table class="ref-table" style="font-size:0.85em"><thead><tr><th>目标评级</th><th>评级线</th><th>所需属性合计</th><th>所需单属性均值</th><th>状态</th></tr></thead><tbody>';
+  for (var i = 0; i < targets.length; i++) {
+    var t = targets[i];
+    var neededAttr = (t.min - fixedScore) / 2;
+
+    html += '<tr>';
+    html += '<td style="font-weight:700">' + t.grade + '</td>';
+    html += '<td>' + t.min.toLocaleString() + '</td>';
+
+    if (neededAttr <= 0) {
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">0</td>';
+      html += '<td style="color:#2ecc71">✓ 已满足</td>';
+    } else {
+      html += '<td>' + Math.ceil(neededAttr).toLocaleString() + '</td>';
+      html += '<td>' + Math.ceil(neededAttr / 3).toLocaleString() + '</td>';
+      html += '<td style="color:var(--gold)">需达标</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  document.getElementById('hif-attr-table').innerHTML = html;
+
+  var maxB1Eval = 5500, maxB2Eval = 7400, maxStar = 1335;
+  var theoreticalMax = Math.floor(maxStar * 7.5 + maxB1Eval + maxB2Eval - 2000);
+  document.getElementById('hif-attr-note').innerHTML =
+    '本战评价值合计：<b>' + Math.round(battleEval).toLocaleString() + '</b>（本战1 ' + Math.round(b1Eval).toLocaleString() + ' + 本战2 ' + Math.round(b2Eval).toLocaleString() + '）&nbsp;|&nbsp;星耀值得分：<b>' + Math.round(starScore).toLocaleString() + '</b>&nbsp;|&nbsp;公式：所需属性合计 = (评级线 − 星耀值得分 − 本战评价值 + 2000) ÷ 2';
+}
+
+function switchHifSub(sub) {
+  hifSubMode = sub;
+  var sharedCard = document.getElementById('hif-shared-inputs');
+  var subTabs = document.querySelectorAll('#mode-hif .sub-tab');
+  var subModes = document.querySelectorAll('#mode-hif .sub-mode');
+  subTabs.forEach(function(t) { t.classList.remove('active'); });
+  subModes.forEach(function(s) { s.classList.remove('active'); });
+
+  if (sub === 'forward') {
+    subTabs[0].classList.add('active');
+    document.getElementById('hif-sub-forward').classList.add('active');
+    sharedCard.style.display = '';
+    updateHifForward();
+  } else if (sub === 'reverse') {
+    subTabs[1].classList.add('active');
+    document.getElementById('hif-sub-reverse').classList.add('active');
+    sharedCard.style.display = '';
+    updateHifReverse();
+  } else {
+    subTabs[2].classList.add('active');
+    document.getElementById('hif-sub-attr').classList.add('active');
+    sharedCard.style.display = 'none';
+    updateHifAttr();
+  }
+}
+
+function switchNewSub(sub) {
+  newSubMode = sub;
+  var sharedCard = document.getElementById('new-shared-inputs');
+  var subTabs = document.querySelectorAll('#mode-new .sub-tab');
+  var subModes = document.querySelectorAll('#mode-new .sub-mode');
+  subTabs.forEach(function(t) { t.classList.remove('active'); });
+  subModes.forEach(function(s) { s.classList.remove('active'); });
+
+  if (sub === 'forward') {
+    subTabs[0].classList.add('active');
+    document.getElementById('new-sub-forward').classList.add('active');
+    sharedCard.style.display = '';
+    updateNewForward();
+  } else if (sub === 'reverse') {
+    subTabs[1].classList.add('active');
+    document.getElementById('new-sub-reverse').classList.add('active');
+    sharedCard.style.display = '';
+    updateNewReverse();
+  } else {
+    subTabs[2].classList.add('active');
+    document.getElementById('new-sub-attr').classList.add('active');
+    sharedCard.style.display = 'none';
+    updateNewAttr();
+  }
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.mode-section').forEach(function(s) { s.classList.remove('active'); });
+
+  if (mode === 'hif') {
+    document.querySelector('.tab:nth-child(1)').classList.add('active');
+    document.getElementById('mode-hif').classList.add('active');
+    document.getElementById('footer').innerHTML = '数据来源：bilibili@優奈 &nbsp;|&nbsp; 公式：[いおん]【#学マス】H.I.F編 S4+への道';
+    updateHifAll();
+  } else if (mode === 'new') {
+    document.querySelector('.tab:nth-child(2)').classList.add('active');
+    document.getElementById('mode-new').classList.add('active');
+    document.getElementById('footer').textContent = '初LG — 中間試験 + 最終試験';
+    updateNewAll();
+  } else if (mode === 'nia') {
+    document.querySelector('.tab:nth-child(3)').classList.add('active');
+    document.getElementById('mode-nia').classList.add('active');
+    document.getElementById('footer').textContent = 'NIA — pro / master 难度';
+    updateNiaAll();
+  } else {
+    document.querySelector('.tab:nth-child(4)').classList.add('active');
+    document.getElementById('mode-first').classList.add('active');
+    document.getElementById('footer').textContent = '初剧本 — pro 难度';
+    updateFirstProAll();
+  }
+}
+
+function toggleCollapse(el) {
+  el.classList.toggle('collapsed');
+  el.nextElementSibling.classList.toggle('hidden');
+}
+
+// ==================== EVENT BINDING ====================
+
+document.getElementById('hif-vo').addEventListener('input', updateHifAll);
+document.getElementById('hif-da').addEventListener('input', updateHifAll);
+document.getElementById('hif-vi').addEventListener('input', updateHifAll);
+document.getElementById('hif-b1').addEventListener('input', updateHifAll);
+document.getElementById('hif-b2').addEventListener('input', updateHifAll);
+document.getElementById('hif-star').addEventListener('input', updateHifAll);
+document.getElementById('hif-attr-b1').addEventListener('input', updateHifAll);
+document.getElementById('hif-attr-b2').addEventListener('input', updateHifAll);
+document.getElementById('hif-attr-star').addEventListener('input', updateHifAll);
+
+document.getElementById('new-vo').addEventListener('input', updateNewAll);
+document.getElementById('new-da').addEventListener('input', updateNewAll);
+document.getElementById('new-vi').addEventListener('input', updateNewAll);
+document.getElementById('new-mid').addEventListener('input', updateNewAll);
+document.getElementById('new-final').addEventListener('input', updateNewAll);
+document.getElementById('new-attr-mid').addEventListener('input', updateNewAll);
+document.getElementById('new-attr-fin').addEventListener('input', updateNewAll);
+
+document.getElementById('nia-pro-vo').addEventListener('input', updateNiaAll);
+document.getElementById('nia-pro-da').addEventListener('input', updateNiaAll);
+document.getElementById('nia-pro-vi').addEventListener('input', updateNiaAll);
+document.getElementById('nia-pro-votes').addEventListener('input', updateNiaAll);
+document.getElementById('nia-mas-vo').addEventListener('input', updateNiaAll);
+document.getElementById('nia-mas-da').addEventListener('input', updateNiaAll);
+document.getElementById('nia-mas-vi').addEventListener('input', updateNiaAll);
+document.getElementById('nia-mas-votes').addEventListener('input', updateNiaAll);
+
+document.getElementById('first-pro-vo').addEventListener('input', updateFirstProAll);
+document.getElementById('first-pro-da').addEventListener('input', updateFirstProAll);
+document.getElementById('first-pro-vi').addEventListener('input', updateFirstProAll);
+document.getElementById('first-pro-exam').addEventListener('input', updateFirstProAll);
+
+// Init
+updateHifAll();
+</script>
+</body>
+</html>
