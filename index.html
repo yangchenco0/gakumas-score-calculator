@@ -373,8 +373,8 @@
         <span style="font-size:0.7em;color:var(--text2)">默认1335（满分）</span>
       </div>
       <div class="input-group">
-        <label style="color:var(--gold)">本战1 得分（万）</label>
-        <input type="number" id="hif-b1" class="exam" placeholder="例: 85" value="85" step="0.1" min="0">
+        <label style="color:var(--gold)">本战1 得分</label>
+        <input type="number" id="hif-b1" class="exam" placeholder="例: 850000" value="0" step="100" min="0">
       </div>
     </div>
   </div>
@@ -392,8 +392,8 @@
       <h2><span class="icon">📝</span>本战2得分输入</h2>
       <div class="input-row">
         <div class="input-group" style="max-width:300px">
-          <label style="color:var(--gold)">本战2 得分（万）</label>
-          <input type="number" id="hif-b2" class="exam" placeholder="例: 120" value="120" step="0.1" min="0">
+          <label style="color:var(--gold)">本战2 得分</label>
+          <input type="number" id="hif-b2" class="exam" placeholder="例: 1200000" value="0" step="100" min="0">
         </div>
       </div>
     </div>
@@ -429,12 +429,12 @@
       <h2><span class="icon">📝</span>本战得分 &amp; 星耀值</h2>
       <div class="input-row">
         <div class="input-group">
-          <label style="color:var(--gold)">本战1 得分（万）</label>
-          <input type="number" id="hif-attr-b1" class="exam" placeholder="例: 85" value="85" step="0.01" min="0">
+          <label style="color:var(--gold)">本战1 得分</label>
+          <input type="number" id="hif-attr-b1" class="exam" placeholder="例: 850000" value="0" step="100" min="0">
         </div>
         <div class="input-group">
-          <label style="color:var(--gold)">本战2 得分（万）</label>
-          <input type="number" id="hif-attr-b2" class="exam" placeholder="例: 120" value="120" step="0.01" min="0">
+          <label style="color:var(--gold)">本战2 得分</label>
+          <input type="number" id="hif-attr-b2" class="exam" placeholder="例: 1200000" value="0" step="100" min="0">
         </div>
         <div class="input-group star-input">
           <label>星耀值合计</label>
@@ -460,16 +460,16 @@
       <table class="ref-table">
         <thead><tr><th>阶段</th><th>得分区间（万）</th><th>倍率</th><th>评价值区间</th></tr></thead>
         <tbody>
-          <tr><td rowspan="5" style="font-weight:700">本战1</td><td>0 ~ 30</td><td>0</td><td>0</td></tr>
-          <tr><td>30 ~ 70</td><td>1.0%</td><td>0 ~ 4,000</td></tr>
-          <tr><td>70 ~ 100</td><td>0.3%</td><td>4,000 ~ 4,900</td></tr>
-          <tr><td>100 ~ 120</td><td>0.2%</td><td>4,900 ~ 5,300</td></tr>
-          <tr><td>120 ~ 140</td><td>0.1%</td><td>5,300 ~ 5,500</td></tr>
-          <tr><td rowspan="5" style="font-weight:700">本战2</td><td>0 ~ 60</td><td>0</td><td>0</td></tr>
-          <tr><td>60 ~ 90</td><td>0.4%</td><td>0 ~ 1,200</td></tr>
-          <tr><td>90 ~ 150</td><td>0.8%</td><td>1,200 ~ 6,000</td></tr>
-          <tr><td>150 ~ 200</td><td>0.2%</td><td>6,000 ~ 7,000</td></tr>
-          <tr><td>200 ~ 240</td><td>0.1%</td><td>7,000 ~ 7,400</td></tr>
+          <tr><td rowspan="5" style="font-weight:700">本战1</td><td>0 ~ 300,000</td><td>0</td><td>0</td></tr>
+          <tr><td>300,000 ~ 700,000</td><td>1.0%</td><td>0 ~ 4,000</td></tr>
+          <tr><td>700,000 ~ 1,000,000</td><td>0.3%</td><td>4,000 ~ 4,900</td></tr>
+          <tr><td>1,000,000 ~ 1,200,000</td><td>0.2%</td><td>4,900 ~ 5,300</td></tr>
+          <tr><td>1,200,000 ~ 1,400,000</td><td>0.1%</td><td>5,300 ~ 5,500</td></tr>
+          <tr><td rowspan="5" style="font-weight:700">本战2</td><td>0 ~ 600,000</td><td>0</td><td>0</td></tr>
+          <tr><td>600,000 ~ 900,000</td><td>0.4%</td><td>0 ~ 1,200</td></tr>
+          <tr><td>900,000 ~ 1,500,000</td><td>0.8%</td><td>1,200 ~ 6,000</td></tr>
+          <tr><td>1,500,000 ~ 2,000,000</td><td>0.2%</td><td>6,000 ~ 7,000</td></tr>
+          <tr><td>2,000,000 ~ 2,400,000</td><td>0.1%</td><td>7,000 ~ 7,400</td></tr>
         </tbody>
       </table>
     </div>
@@ -503,19 +503,19 @@
     <div class="input-row">
       <div class="input-group">
         <label style="color:var(--vo)">Vo（声乐）</label>
-        <input type="number" id="new-vo" class="vo" placeholder="例: 3500" value="3500" step="1">
+        <input type="number" id="new-vo" class="vo" placeholder="例: 3500" value="0" step="1">
       </div>
       <div class="input-group">
         <label style="color:var(--da)">Da（舞蹈）</label>
-        <input type="number" id="new-da" class="da" placeholder="例: 3200" value="3200" step="1">
+        <input type="number" id="new-da" class="da" placeholder="例: 3200" value="0" step="1">
       </div>
       <div class="input-group">
         <label style="color:var(--vi)">Vi（视觉）</label>
-        <input type="number" id="new-vi" class="vi" placeholder="例: 3000" value="3000" step="1">
+        <input type="number" id="new-vi" class="vi" placeholder="例: 3000" value="0" step="1">
       </div>
       <div class="input-group">
         <label style="color:var(--gold)">中間試験 得分</label>
-        <input type="number" id="new-mid" class="exam" placeholder="例: 50000" value="50000" step="100" min="0">
+        <input type="number" id="new-mid" class="exam" placeholder="例: 200000" value="200000" step="100" min="0">
       </div>
     </div>
   </div>
@@ -534,7 +534,7 @@
       <div class="input-row">
         <div class="input-group" style="max-width:300px">
           <label style="color:var(--gold)">最終試験 得分</label>
-          <input type="number" id="new-final" class="exam" placeholder="例: 500000" value="500000" step="100" min="0">
+          <input type="number" id="new-final" class="exam" placeholder="例: 500000" value="0" step="100" min="0">
         </div>
       </div>
     </div>
@@ -571,11 +571,11 @@
       <div class="input-row">
         <div class="input-group">
           <label style="color:var(--gold)">中間試験 得分</label>
-          <input type="number" id="new-attr-mid" class="exam" placeholder="例: 50000" value="50000" step="100" min="0">
+          <input type="number" id="new-attr-mid" class="exam" placeholder="例: 200000" value="200000" step="100" min="0">
         </div>
         <div class="input-group">
           <label style="color:var(--gold)">最終試験 得分</label>
-          <input type="number" id="new-attr-fin" class="exam" placeholder="例: 500000" value="500000" step="100" min="0">
+          <input type="number" id="new-attr-fin" class="exam" placeholder="例: 500000" value="0" step="100" min="0">
         </div>
       </div>
     </div>
@@ -917,52 +917,52 @@ function renderGradeScale(containerId, score) {
   document.getElementById(containerId).innerHTML = html;
 }
 
-function calcHifBattle1(scoreWan) {
-  const s = scoreWan;
-  if (s <= 30) return 0;
-  if (s <= 70) return (s - 30) * 10000 * 0.01;
-  if (s <= 100) return 4000 + (s - 70) * 10000 * 0.003;
-  if (s <= 120) return 4900 + (s - 100) * 10000 * 0.002;
-  if (s <= 140) return 5300 + (s - 120) * 10000 * 0.001;
+function calcHifBattle1(score) {
+  var s = score;
+  if (s <= 300000) return 0;
+  if (s <= 700000) return (s - 300000) * 0.01;
+  if (s <= 1000000) return 4000 + (s - 700000) * 0.003;
+  if (s <= 1200000) return 4900 + (s - 1000000) * 0.002;
+  if (s <= 1400000) return 5300 + (s - 1200000) * 0.001;
   return 5500;
 }
 
-function calcHifBattle2(scoreWan) {
-  var s = scoreWan;
-  if (s <= 60) return 0;
-  if (s <= 90) return (s - 60) * 10000 * 0.004;
-  if (s <= 150) return 1200 + (s - 90) * 10000 * 0.008;
-  if (s <= 200) return 6000 + (s - 150) * 10000 * 0.002;
-  if (s <= 240) return 7000 + (s - 200) * 10000 * 0.001;
+function calcHifBattle2(score) {
+  var s = score;
+  if (s <= 600000) return 0;
+  if (s <= 900000) return (s - 600000) * 0.004;
+  if (s <= 1500000) return 1200 + (s - 900000) * 0.008;
+  if (s <= 2000000) return 6000 + (s - 1500000) * 0.002;
+  if (s <= 2400000) return 7000 + (s - 2000000) * 0.001;
   return 7400;
 }
 
 // Reverse: given needed eval, find required 本战2 score (raw number)
 function reverseBattle2Eval(neededEval) {
   if (neededEval <= 0) return 0;
-  if (neededEval <= 1200) return Math.round((60 + neededEval / 40) * 10000);
-  if (neededEval <= 6000) return Math.round((90 + (neededEval - 1200) / 80) * 10000);
-  if (neededEval <= 7000) return Math.round((150 + (neededEval - 6000) / 20) * 10000);
-  if (neededEval <= 7400) return Math.round((200 + (neededEval - 7000) / 10) * 10000);
+  if (neededEval <= 1200) return Math.round(600000 + neededEval / 0.004);
+  if (neededEval <= 6000) return Math.round(900000 + (neededEval - 1200) / 0.008);
+  if (neededEval <= 7000) return Math.round(1500000 + (neededEval - 6000) / 0.002);
+  if (neededEval <= 7400) return Math.round(2000000 + (neededEval - 7000) / 0.001);
   return Infinity;
 }
 
 function getHifB1Range(s) {
-  if (s <= 30) return '0~30万';
-  if (s <= 70) return '30~70万';
-  if (s <= 100) return '70~100万';
-  if (s <= 120) return '100~120万';
-  if (s <= 140) return '120~140万';
-  return '140万+';
+  if (s <= 300000) return '0~300,000';
+  if (s <= 700000) return '300,000~700,000';
+  if (s <= 1000000) return '700,000~1,000,000';
+  if (s <= 1200000) return '1,000,000~1,200,000';
+  if (s <= 1400000) return '1,200,000~1,400,000';
+  return '1,400,000+';
 }
 
 function getHifB2Range(s) {
-  if (s <= 60) return '0~60万';
-  if (s <= 90) return '60~90万';
-  if (s <= 150) return '90~150万';
-  if (s <= 200) return '150~200万';
-  if (s <= 240) return '200~240万';
-  return '240万+';
+  if (s <= 600000) return '0~600,000';
+  if (s <= 900000) return '600,000~900,000';
+  if (s <= 1500000) return '900,000~1,500,000';
+  if (s <= 2000000) return '1,500,000~2,000,000';
+  if (s <= 2400000) return '2,000,000~2,400,000';
+  return '2,400,000+';
 }
 
 function updateHifForward() {
@@ -1020,8 +1020,8 @@ function updateHifForward() {
     '<div class="bar-row"><div class="bar-label">固定扣分</div><div class="bar-track"><div class="bar-fill penalty" style="width:' + (2000/maxVal*100).toFixed(1) + '%">−2,000</div></div></div>';
 
   document.getElementById('hif-eval-detail').innerHTML =
-    '本战1: ' + b1 + '万 → <span>' + getHifB1Range(b1) + '</span> → 评价值 <span>' + Math.round(b1Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
-    '本战2: ' + b2 + '万 → <span>' + getHifB2Range(b2) + '</span> → 评价值 <span>' + Math.round(b2Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '本战1: ' + b1.toLocaleString() + ' → <span>' + getHifB1Range(b1) + '</span> → 评价值 <span>' + Math.round(b1Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
+    '本战2: ' + b2.toLocaleString() + ' → <span>' + getHifB2Range(b2) + '</span> → 评价值 <span>' + Math.round(b2Eval).toLocaleString() + '</span> &nbsp;|&nbsp;' +
     '本战评价值合计: <span>' + Math.round(battleEval).toLocaleString() + '</span>';
 }
 
